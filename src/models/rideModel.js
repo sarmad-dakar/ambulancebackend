@@ -28,7 +28,24 @@ const rideSchema = new mongoose.Schema(
         required: true,
       },
     },
-
+    vehicle: {
+      oxygenCylinder: {
+        type: Boolean,
+        default: false,
+      },
+      bloodPressureMachine: {
+        type: Boolean,
+        default: false,
+      },
+      wheelchair: {
+        type: Boolean,
+        default: false,
+      },
+      paramedic: {
+        type: Boolean,
+        default: false,
+      },
+    },
     requestedAt: {
       type: Date,
       default: Date.now,

@@ -40,6 +40,28 @@ const userSchema = new mongoose.Schema({
       index: "2dsphere",
     },
   },
+  vehicle: {
+    oxygenCylinder: {
+      type: Boolean,
+      default: false,
+    },
+    bloodPressureMachine: {
+      type: Boolean,
+      default: false,
+    },
+    wheelchair: {
+      type: Boolean,
+      default: false,
+    },
+    paramedic: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  vehicleRegistered: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const User = mongoose.model("User", userSchema);

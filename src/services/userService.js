@@ -98,8 +98,36 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+const updateVehicleDetails = async (req, res) => {
+  try {
+    const { vehicleData } = req.body;
+    const driverId = req.user.id;
+
+    // Check if the user is a driver
+    const driver = await User.findById(driverId);
+    if (!driver || driver.role !== "driver") {
+      return res.status(403).send({ message: "User is not a driver." });
+    }
+
+    // Update vehicle details and mark vehicleRegistered as true
+    driver.vehicle = vehicleData;
+    driver.vehicleRegistered = true;
+    await driver.save();
+
+    return res.status(200).send({
+      message: "Vehicle details updated successfully.",
+      vehicle: driver.vehicle,
+      vehicleRegistered: driver.vehicleRegistered,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Error updating vehicle details." });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
+  updateVehicleDetails,
 };

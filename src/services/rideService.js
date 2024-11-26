@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 
 const requestRide = async (req, res) => {
   try {
-    const { pickupLocation } = req.body;
+    const { pickupLocation, vehicle } = req.body;
     const userId = req.user.id; // Authenticated user making the request
 
     const newRide = new Ride({
@@ -15,6 +15,7 @@ const requestRide = async (req, res) => {
           parseFloat(pickupLocation.latitude),
         ],
       },
+      vehicle,
     });
 
     const savedRide = await newRide.save();
