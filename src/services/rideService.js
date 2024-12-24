@@ -17,11 +17,16 @@ const requestRide = async (req, res) => {
       },
       vehicle,
     });
+    const userObject = await User.findById(userId);
 
     const savedRide = await newRide.save();
     res.status(201).send({
       message: "Ride requested successfully.",
       ride: savedRide,
+      userOject: {
+        riderName: `${userObject.firstName} ${userObject.lastName}`,
+        riderEmail: userObject.email,
+      },
     });
   } catch (error) {
     console.log(error);
