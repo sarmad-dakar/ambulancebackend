@@ -2,13 +2,20 @@ var socketToConversation = {};
 const emergencySocketService = (socket, io) => {
   console.log(`User connected with socket ID: ${socket.id}`);
 
-  // Handle user joining a room by conversation ID
   socket.on("joinRoom", (conversationId) => {
+    // Check if the user is already in a room
+    const previousRoom = socketToConversation[socket.id];
+    if (previousRoom) {
+      // Remove user from the previous room
+      socket.leave(String(previousRoom));
+      console.log(`User ${socket.id} left previous room ${previousRoom}`);
+    }
+
+    // Join the new room
     socket.join(String(conversationId));
     socketToConversation[socket.id] = conversationId;
     console.log(`User ${socket.id} joined room ${conversationId}`);
   });
-
   // Handle sending messages to the room with the same conversation ID
   socket.on("sendMessage", (message) => {
     const conversationId = socketToConversation[socket.id];
