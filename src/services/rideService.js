@@ -34,6 +34,58 @@ const requestRide = async (req, res) => {
   }
 };
 
+const driverOngoingRide = async (req, res) => {
+  try {
+    const driverId = req.user.id; // Authenticated driver
+
+    // Find an ongoing ride that is accepted by the driver and not completed
+    const ongoingRide = await Ride.findOne({
+      acceptedBy: driverId,
+      status: { $in: ["accepted", "in-progress"] }, // Include statuses for ongoing rides
+    }).populate("requestedBy", "firstName lastName email");
+
+    if (!ongoingRide) {
+      return res
+        .status(404)
+        .send({ message: "No ongoing rides found for this driver." });
+    }
+
+    res.status(200).send({
+      message: "Ongoing ride retrieved successfully.",
+      ride: ongoingRide,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching ongoing ride." });
+  }
+};
+
+const userLastRide = async (req, res) => {
+  try {
+    const userid = req.user.id; // Authenticated driver
+
+    // Find an ongoing ride that is accepted by the driver and not completed
+    const ongoingRide = await Ride.findOne({
+      requestedBy: userid,
+      status: { $in: ["accepted"] }, // Include statuses for ongoing rides
+    }).populate("requestedBy", "firstName lastName email");
+
+    if (!ongoingRide) {
+      return res
+        .status(404)
+        .send({ message: "No ongoing rides found for this driver." });
+    }
+
+    res.status(200).send({
+      message: "Ongoing ride retrieved successfully.",
+      ride: ongoingRide,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching ongoing ride." });
+  }
+};
+
 const acceptRide = async (req, res) => {
   try {
     const { rideId } = req.body;
@@ -86,8 +138,8 @@ const acceptRide = async (req, res) => {
 
 const completeRide = async (req, res) => {
   try {
-    const { rideId } = req.params;
-
+    const { rideId } = req.body;
+    console.log(rideId, "ride id ");
     const ride = await Ride.findById(rideId);
     if (!ride) {
       return res.status(404).send({ message: "Ride not found." });
@@ -117,4 +169,6 @@ module.exports = {
   requestRide,
   acceptRide,
   completeRide,
+  userLastRide,
+  driverOngoingRide,
 };

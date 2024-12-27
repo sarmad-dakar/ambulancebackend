@@ -5,6 +5,8 @@ const { auth } = require("../middlewares/auth");
 
 router.post("/request", auth, rideService.requestRide);
 router.post("/accept", auth, rideService.acceptRide);
-router.get("/complete", auth, rideService.completeRide);
+router.post("/complete", auth, rideService.completeRide);
+router.get("/ongoingDriver", auth, rideService.driverOngoingRide);
+router.get("/ongoingUserRide", auth, rideService.userLastRide);
 
 module.exports = router;
