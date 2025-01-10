@@ -14,6 +14,15 @@ const userSchema = new mongoose.Schema({
     required: false,
     unique: true,
   },
+  phone: {
+    type: String,
+    required: false,
+    unique: true,
+  },
+  bloodGroup: {
+    type: String,
+    required: false,
+  },
 
   password: {
     type: String,
