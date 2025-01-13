@@ -42,6 +42,10 @@ app.set("port", process.env.PORT || 4000);
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("<h1>Welcome to Ambulance Backend</h1>");
+});
+
 app.use("/api/user", userRoutes);
 app.use("/api/ride", rideRoutes);
 
