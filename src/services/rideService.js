@@ -42,7 +42,7 @@ const driverOngoingRide = async (req, res) => {
     const ongoingRide = await Ride.findOne({
       acceptedBy: driverId,
       status: { $in: ["accepted", "in-progress"] }, // Include statuses for ongoing rides
-    }).populate("requestedBy", "firstName lastName email");
+    }).populate("requestedBy");
 
     if (!ongoingRide) {
       return res
@@ -68,7 +68,7 @@ const userLastRide = async (req, res) => {
     const ongoingRide = await Ride.findOne({
       requestedBy: userid,
       status: { $in: ["accepted"] }, // Include statuses for ongoing rides
-    }).populate("acceptedBy", "firstName lastName email");
+    }).populate("acceptedBy");
 
     if (!ongoingRide) {
       return res
