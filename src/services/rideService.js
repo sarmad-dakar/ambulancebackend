@@ -165,10 +165,63 @@ const completeRide = async (req, res) => {
   }
 };
 
+const getAllRides = async (req, res) => {
+  try {
+    const rides = await Ride.find().populate("requestedBy acceptedBy");
+    res.status(200).send({
+      message: "All rides retrieved successfully.",
+      rides,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching all rides." });
+  }
+};
+
+const getTotalNumberOfRides = async (req, res) => {
+  try {
+    const totalRides = await Ride.countDocuments();
+    res.status(200).send({
+      message: "Total number of rides retrieved successfully.",
+      totalRides,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error fetching total number of rides." });
+  }
+};
+
+const getRideRatio = async (req, res) => {
+  try {
+    const completedRides = await Ride.countDocuments({ status: "completed" });
+    const otherRides = await Ride.countDocuments({
+      status: { $ne: "completed" },
+    });
+
+    const ratio =
+      otherRides === 0
+        ? "All rides completed"
+        : (completedRides / otherRides).toFixed(2);
+
+    res.status(200).send({
+      message: "Ride ratio retrieved successfully.",
+      completedRides,
+      otherRides,
+      ratio,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error calculating ride ratio." });
+  }
+};
+
 module.exports = {
   requestRide,
   acceptRide,
   completeRide,
   userLastRide,
   driverOngoingRide,
+  getAllRides,
+  getRideRatio,
+  getTotalNumberOfRides,
 };

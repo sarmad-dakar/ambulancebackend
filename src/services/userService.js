@@ -136,9 +136,31 @@ const updateVehicleDetails = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: "user" }, "-password"); // Excluding passwords from response
+    res.status(200).send(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Error fetching users." });
+  }
+};
+
+const getAllDrivers = async (req, res) => {
+  try {
+    const drivers = await User.find({ role: "driver" }, "-password");
+    res.status(200).send(drivers);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Error fetching drivers." });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
   updateVehicleDetails,
+  getAllUsers,
+  getAllDrivers,
 };
