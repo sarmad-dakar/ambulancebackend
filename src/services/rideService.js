@@ -167,7 +167,10 @@ const completeRide = async (req, res) => {
 
 const getAllRides = async (req, res) => {
   try {
-    const rides = await Ride.find().populate("requestedBy acceptedBy");
+    const rides = await Ride.find()
+      .populate("requestedBy acceptedBy")
+      .sort({ createdAt: -1 }); // Sorting by latest
+
     res.status(200).send({
       message: "All rides retrieved successfully.",
       rides,

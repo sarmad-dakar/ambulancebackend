@@ -138,7 +138,11 @@ const updateVehicleDetails = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: "user" }, "-password"); // Excluding passwords from response
+    const users = await User.find({ role: "user" }, "-password").sort({
+      createdAt: -1,
+    }); // Sorting by latest
+
+    // Excluding passwords from response
     res.status(200).send(users);
   } catch (error) {
     console.log(error);
@@ -148,7 +152,10 @@ const getAllUsers = async (req, res) => {
 
 const getAllDrivers = async (req, res) => {
   try {
-    const drivers = await User.find({ role: "driver" }, "-password");
+    const drivers = await User.find({ role: "driver" }, "-password").sort({
+      createdAt: -1,
+    }); // Sorting by latest
+
     res.status(200).send(drivers);
   } catch (error) {
     console.log(error);
