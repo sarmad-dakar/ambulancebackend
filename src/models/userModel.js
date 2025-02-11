@@ -71,6 +71,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isPhoneVerified: {
+    type: Boolean,
+    default: false,
+  },
+  isAdminApproved: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const User = mongoose.model("User", userSchema);

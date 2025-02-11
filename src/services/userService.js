@@ -35,6 +35,7 @@ const registerUser = async (req, res) => {
       bloodGroup,
       password: hashedPassword,
       role: role,
+      isAdminApproved: role == "user" ? true : false,
       location: {
         type: "Point",
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
@@ -163,6 +164,32 @@ const getAllDrivers = async (req, res) => {
   }
 };
 
+const approveDriver = async (req, res) => {
+  try {
+    const { user } = req.body;
+
+    const driver = await User.findById(user);
+
+    if (!driver) {
+      return res.status(404).send({ message: "Driver not found." });
+    }
+
+    // Toggle isAdminApproved value
+    driver.isAdminApproved = !driver.isAdminApproved;
+    await driver.save();
+
+    res.status(200).send({
+      message: `Driver ${
+        driver.isAdminApproved ? "approved" : "disapproved"
+      } successfully.`,
+      driver,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Error updating driver." });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -170,4 +197,5 @@ module.exports = {
   updateVehicleDetails,
   getAllUsers,
   getAllDrivers,
+  approveDriver,
 };
