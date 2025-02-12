@@ -11,5 +11,6 @@ router.get("/getAllDrivers", userService.getAllDrivers);
 router.get("/profile", auth, userService.getUserProfile);
 router.post("/updateVehicle", auth, userService.updateVehicleDetails);
 router.post("/approveDriver", userService.approveDriver);
+router.post("/verifyOtp", userService.verifyOTP);
 
 module.exports = router;

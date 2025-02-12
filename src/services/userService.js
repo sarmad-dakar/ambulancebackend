@@ -2,6 +2,19 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const saltRounds = 10; // The number of salt rounds for bcrypt hashing
 const jwt = require("jsonwebtoken");
+const twilio = require("twilio");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "Yahoo",
+  auth: {
+    user: "sarmadshakeel30@yahoo.com",
+    pass: "zcsjxxoeegloqurc",
+  },
+});
+
+const generateOTP = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 
 const registerUser = async (req, res) => {
   try {
@@ -17,6 +30,7 @@ const registerUser = async (req, res) => {
       bloodGroup,
     } = req.body;
     // Check if the user with the provided email already exists
+    console.log(req.body);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
@@ -26,6 +40,7 @@ const registerUser = async (req, res) => {
 
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const otp = generateOTP();
 
     const newUser = new User({
       firstName,
@@ -40,11 +55,25 @@ const registerUser = async (req, res) => {
         type: "Point",
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
       },
+      otp,
     });
     const response = await newUser.save();
+
+    const mailOptions = {
+      from: "sarmadshakeel30@yahoo.com",
+      to: email,
+      subject: "Your OTP for Email Verification",
+      text: `Your OTP for verification is: ${otp}. This OTP will expire in 10 minutes.`,
+    };
     res.status(201).send({
-      message: "User registered successfully.",
-      user_id: response._id,
+      message: "User registered successfully. OTP sent to email.",
+      user_id: newUser._id,
+    });
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      }
     });
   } catch (error) {
     console.log(error);
@@ -63,6 +92,11 @@ const loginUser = async (req, res) => {
 
     if (!user) {
       return res.status(404).send({ message: "User not found." });
+    }
+    if (!user.isAdminApproved && user?.role == "driver") {
+      return res
+        .status(403)
+        .send({ message: "Your account is not approved by admin." });
     }
 
     // Compare the provided password with the hashed password stored in the database
@@ -86,6 +120,34 @@ const loginUser = async (req, res) => {
     res.status(400).send({ message: "Error occurred during login." });
   }
 };
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    // Find the user by email and OTP
+    console.log(email, otp);
+    const user = await User.findOne({ email, otp });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Invalid OTP. Please try again." });
+    }
+
+    // Clear OTP after successful verification
+    user.isPhoneVerified = true;
+    user.otp = null;
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error verifying OTP." });
+  }
+};
+
+module.exports = { registerUser, verifyOTP };
 
 const getUserProfile = async (req, res) => {
   try {
@@ -198,4 +260,5 @@ module.exports = {
   getAllUsers,
   getAllDrivers,
   approveDriver,
+  verifyOTP,
 };
